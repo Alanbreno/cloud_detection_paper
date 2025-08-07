@@ -81,14 +81,13 @@ def main():
     print(f"  -> Batch Size: {args.batch_size}")
     print("="*50)
     print("\nIniciando o processo de treinamento...\n")
-
+    ##"/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0002.part.taco",
     if args.tipo_imagem == "l2a":
         dataset = tacoreader.load(["/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0000.part.taco",
                                     "/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0001.part.taco",
-                                    #"/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0002.part.taco",
                                     "/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0003.part.taco",
-                                    #"/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0004.part.taco",
-                                    #"/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0005.part.taco",
+                                    "/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0004.part.taco",
+                                    "/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0005.part.taco",
                                     ])
         df = dataset[(dataset["label_type"] == "high") & (dataset["real_proj_shape"] == 509)]
 
