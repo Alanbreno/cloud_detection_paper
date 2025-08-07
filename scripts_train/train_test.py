@@ -45,7 +45,7 @@ def main():
     )
     
     parser.add_argument(
-        "encoder",
+        "-e", "--encoder",
         type=str,
         default="efficientnet-b1",
         help="Tipo do encoder a ser usado."
