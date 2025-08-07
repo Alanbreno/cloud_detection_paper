@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
-import config
 import torch
 import rasterio as rio
 import tacoreader
