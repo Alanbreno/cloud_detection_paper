@@ -23,6 +23,10 @@ class CoreDataModule(pl.LightningDataModule):
         self.train_dataset = dataframe[dataframe["tortilla:data_split"] == "train"]
         self.validation_dataset = dataframe[dataframe["tortilla:data_split"] == "validation"]
         self.test_dataset = dataframe[dataframe["tortilla:data_split"] == "test"]
+        
+        print(f"Train dataset size: {len(self.train_dataset)}")
+        print(f"Validation dataset size: {len(self.validation_dataset)}")
+        print(f"Test dataset size: {len(self.test_dataset)}")
 
         # Definir o batch_size
         self.batch_size = batch_size
