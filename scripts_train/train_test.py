@@ -133,7 +133,7 @@ def main():
     
     # Define the trainer
     trainer = pl.Trainer(
-        max_epochs=args.epochs,
+        max_epochs=100,
         log_every_n_steps=1,
         callbacks=callbacks,
         accelerator="auto",
