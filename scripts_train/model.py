@@ -5,12 +5,13 @@ import torch.nn.functional as F
 from torch.optim import lr_scheduler
 
 
-class UNet_CD_Sentinel_2(pl.LightningModule):
-    def __init__(self, encoder_name, classes, in_channels, learning_rate):
+class Segformer_CD_Sentinel_2(pl.LightningModule):
+    def __init__(self, name, encoder_name, classes, in_channels, learning_rate):
         super().__init__()
-        self.model = smp.Unet(
+        self.model = smp.create_model(
+            arch=name,
             encoder_name=encoder_name,
-            encoder_weights=None,
+            encoder_weights='imagenet',
             classes=classes,
             in_channels=in_channels,
         )

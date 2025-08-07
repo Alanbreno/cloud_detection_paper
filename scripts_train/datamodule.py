@@ -16,7 +16,7 @@ augmentation_pipeline = A.Compose(
 )
 
 class CoreDataModule(pl.LightningDataModule):
-    def __init__(self, dataframe: pd.DataFrame, batch_size: int = 4):
+    def __init__(self, dataframe: pd.DataFrame, batch_size: int = 4, num_workers: int = 4):
         super().__init__()
 
         # Separar o DataFrame em datasets de treino, validação e teste
@@ -26,6 +26,7 @@ class CoreDataModule(pl.LightningDataModule):
 
         # Definir o batch_size
         self.batch_size = batch_size
+        self.num_workers = num_workers
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(
@@ -35,7 +36,7 @@ class CoreDataModule(pl.LightningDataModule):
             ),
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=4,
+            num_workers=self.num_workers,
         )
 
     def val_dataloader(self):
@@ -43,12 +44,12 @@ class CoreDataModule(pl.LightningDataModule):
             dataset=CoreDataset(
                 self.validation_dataset),
             batch_size=self.batch_size,
-            num_workers=4,
+            num_workers=self.num_workers,
         )
 
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
             dataset=CoreDataset(self.test_dataset),
             batch_size=self.batch_size,
-            num_workers=4,
+            num_workers=self.num_workers,
         )

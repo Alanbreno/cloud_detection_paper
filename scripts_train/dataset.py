@@ -7,10 +7,11 @@ import rasterio as rio
 import tacoreader
 
 class CoreDataset(Dataset):
-    def __init__(self, subset, augmentations=None):
+    def __init__(self, subset, augmentations=None, bandas=[1,2,3,4,5,6,7,8,9,10,11,12,13]):
         self.subset = subset
         self.augmentations = augmentations
         self.cache = {}
+        self.bandas = bandas
 
     def __len__(self):
         return len(self.subset)
@@ -26,7 +27,7 @@ class CoreDataset(Dataset):
 
         # Open the files and load data
         with rio.open(s2l1c) as src, rio.open(target) as dst:
-            s2l1c_data: np.ndarray = src.read().astype(np.float32)/10000
+            s2l1c_data: np.ndarray = src.read(self.bandas).astype(np.float32)/10000
             target_data: np.ndarray = dst.read().astype(np.int64)
             
         target_data = target_data.squeeze()  # Removendo a dimensão extra
