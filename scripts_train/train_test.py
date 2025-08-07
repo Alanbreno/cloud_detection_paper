@@ -110,7 +110,7 @@ def main():
     
     # Define the model
     model = UNet_CD_Sentinel_2(
-        arch=args.nome_modelo,
+        name=args.nome_modelo,
         encoder_name=args.encoder,
         classes=4,
         in_channels=num_bandas,
