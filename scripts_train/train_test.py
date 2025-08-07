@@ -106,6 +106,7 @@ def main():
     datamodule = CoreDataModule(
         dataframe=df,
         batch_size=args.batch_size,
+        bandas=args.bandas_usadas,
     )
     
     # Define the model
