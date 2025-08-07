@@ -6,7 +6,7 @@ import rasterio as rio
 import tacoreader
 
 class CoreDataset(Dataset):
-    def __init__(self, subset, augmentations=None, bandas=[1,2,3,4,5,6,7,8,9,10,11,12,13]):
+    def __init__(self, subset, augmentations=None, bandas=None):
         self.subset = subset
         self.augmentations = augmentations
         self.cache = {}
