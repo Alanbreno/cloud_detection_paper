@@ -20,10 +20,10 @@ class CoreDataModule(pl.LightningDataModule):
         super().__init__()
 
         # Separar o DataFrame em datasets de treino, validação e teste
-        self.train_dataset = dataframe[dataframe["tortilla:data_split"] == "train"]
-        self.validation_dataset = dataframe[dataframe["tortilla:data_split"] == "validation"]
-        self.test_dataset = dataframe[dataframe["tortilla:data_split"] == "test"]
-        
+        self.train_dataset = dataframe[dataframe["tortilla:data_split"] == "train"][0:100]
+        self.validation_dataset = dataframe[dataframe["tortilla:data_split"] == "validation"][0:20]
+        self.test_dataset = dataframe[dataframe["tortilla:data_split"] == "test"][0:20]
+
         print(f"Train dataset size: {len(self.train_dataset)}")
         print(f"Validation dataset size: {len(self.validation_dataset)}")
         print(f"Test dataset size: {len(self.test_dataset)}")
@@ -43,6 +43,7 @@ class CoreDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
+            persistent_workers=True
         )
 
     def val_dataloader(self):
@@ -53,6 +54,7 @@ class CoreDataModule(pl.LightningDataModule):
             ),
             batch_size=self.batch_size,
             num_workers=self.num_workers,
+            persistent_workers=True
         )
 
     def test_dataloader(self):
@@ -60,4 +62,5 @@ class CoreDataModule(pl.LightningDataModule):
             dataset=CoreDataset(self.test_dataset, bandas=self.bandas),
             batch_size=self.batch_size,
             num_workers=self.num_workers,
+            persistent_workers=True
         )

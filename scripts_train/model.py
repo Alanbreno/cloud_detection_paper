@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch.optim import lr_scheduler
 
 
-class UNet_CD_Sentinel_2(pl.LightningModule):
+class CD_Sentinel_2(pl.LightningModule):
     def __init__(self, name, encoder_name, classes, in_channels, learning_rate):
         super().__init__()
         self.model = smp.create_model(

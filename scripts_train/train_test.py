@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.loggers import CSVLogger
 from datamodule import CoreDataModule
-from model import UNet_CD_Sentinel_2
+from model import CD_Sentinel_2
 import metrics
 import tacoreader
 import torch
@@ -83,11 +83,20 @@ def main():
     print("\nIniciando o processo de treinamento...\n")
     ##"/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0002.part.taco",
     if args.tipo_imagem == "l2a":
-        dataset = tacoreader.load(["/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0000.part.taco",
-                                    "/home/mseruffo/taco_CloudSen12/cloudsen12-l2a.0001.part.taco",
-                                    "/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0003.part.taco",
-                                    "/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0004.part.taco",
-                                    "/scratch/MSERUFFO/taco_CloudSen12/cloudsen12-l2a.0005.part.taco",
+        dataset = tacoreader.load([ r"./cloudsen12-l2a.0000.part.taco",
+                                    r"./cloudsen12-l2a.0001.part.taco",
+                                    r"./cloudsen12-l2a.0003.part.taco",
+                                    r"./cloudsen12-l2a.0004.part.taco",
+                                    r"./cloudsen12-l2a.0005.part.taco",
+                                    ])
+        df = dataset[(dataset["label_type"] == "high") & (dataset["real_proj_shape"] == 509)]
+        
+    elif args.tipo_imagem == "l1c":
+        dataset = tacoreader.load([ r"./cloudsen12-l1c.0000.part.taco",
+                                    r"./cloudsen12-l1c.0001.part.taco",
+                                    r"./cloudsen12-l1c.0002.part.taco",
+                                    r"./cloudsen12-l1c.0003.part.taco",
+                                    r"./cloudsen12-l1c.0004.part.taco",
                                     ])
         df = dataset[(dataset["label_type"] == "high") & (dataset["real_proj_shape"] == 509)]
 
@@ -96,10 +105,10 @@ def main():
 
     # Nome do diretório de saída e log
     name_output = f'{args.tipo_imagem}_{args.nome_modelo}_{args.encoder}_{num_bandas}bandas'
-    
-    dir_log = '/home/mseruffo/lightning_logs/'
+
+    dir_log = r'./lightning_logs'
     # Define o tensor board logger
-    tb_logger = TensorBoardLogger(dir_log, name=name_output)
+    tb_logger = CSVLogger(dir_log, name=name_output)
 
     # Define the datamodule
     datamodule = CoreDataModule(
@@ -109,7 +118,7 @@ def main():
     )
     
     # Define the model
-    model = UNet_CD_Sentinel_2(
+    model = CD_Sentinel_2(
         name=args.nome_modelo,
         encoder_name=args.encoder,
         classes=4,
@@ -145,6 +154,31 @@ def main():
     torch.set_float32_matmul_precision('medium')
     # Start the training
     trainer.fit(model=model, datamodule=datamodule)
+    
+    
+    # Carregar o melhor modelo diretamente
+    model = CD_Sentinel_2.load_from_checkpoint(
+        checkpoint_callback.best_model_path,
+        name=args.nome_modelo,
+        encoder_name=args.encoder,
+        classes=4,
+        in_channels=num_bandas,
+        learning_rate=1e-3,
+    )
+
+    # run val dataset
+    val_metrics = trainer.validate(model, datamodule=datamodule, verbose=True)
+    print(val_metrics)
+
+    # run test dataset
+    test_metrics = trainer.test(model, datamodule=datamodule, verbose=True)
+    print(test_metrics)
+
+    acuracia, iou, f1_score, recall, precision, sensitivity = metrics.calculate_metrics(datamodule.test_dataloader(), model.model)
+
+    # Salva o modelo treinado
+    smp_model = model.model
+    smp_model.save_pretrained(dir_log + name_output + "/model")
 
 if __name__ == "__main__":
     main()
