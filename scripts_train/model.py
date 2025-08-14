@@ -148,7 +148,7 @@ class CD_Sentinel_2(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         # Define o scheduler para reduzir LR se a perda de validação não diminuir por 4 épocas
         scheduler = lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode="min", factor=0.1, patience=4, min_lr=1e-6, verbose=True
+            optimizer, mode="min", factor=0.1, patience=4, min_lr=1e-6
         )
         return {
             "optimizer": optimizer,
