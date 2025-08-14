@@ -1,0 +1,28 @@
+# Essenciais para Deep Learning e Tensores
+torch
+torchvision
+
+# Framework de alto nível para PyTorch
+pytorch-lightning
+
+# Modelos de segmentação pré-treinados
+segmentation-models-pytorch
+
+# Manipulação de dados e dataframes
+pandas
+numpy
+
+# Aumento de imagem (Data Augmentation)
+albumentations
+
+# Leitura e escrita de dados geoespaciais raster
+rasterio
+
+# Leitor para o formato de arquivo .taco
+tacoreader
+
+# Barra de progresso para loops
+tqdm
+
+# Dependência para alguns encoders do segmentation-models-pytorch
+timm
