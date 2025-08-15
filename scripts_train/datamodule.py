@@ -20,9 +20,9 @@ class CoreDataModule(pl.LightningDataModule):
         super().__init__()
 
         # Separar o DataFrame em datasets de treino, validação e teste
-        self.train_dataset = dataframe[dataframe["tortilla:data_split"] == "train"][0:100]
-        self.validation_dataset = dataframe[dataframe["tortilla:data_split"] == "validation"][0:20]
-        self.test_dataset = dataframe[dataframe["tortilla:data_split"] == "test"][0:20]
+        self.train_dataset = dataframe[dataframe["tortilla:data_split"] == "train"]
+        self.validation_dataset = dataframe[dataframe["tortilla:data_split"] == "validation"]
+        self.test_dataset = dataframe[dataframe["tortilla:data_split"] == "test"]
 
         print(f"Train dataset size: {len(self.train_dataset)}")
         print(f"Validation dataset size: {len(self.validation_dataset)}")
