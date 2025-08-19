@@ -106,7 +106,7 @@ def main():
     # Nome do diretório de saída e log
     name_output = f'{args.tipo_imagem}_{args.nome_modelo}_{args.encoder}_{num_bandas}bandas'
 
-    dir_log = r'./lightning_logs'
+    dir_log = r'./lightning_logs/'
     # Define o tensor board logger
     tb_logger = CSVLogger(dir_log, name=name_output)
 
@@ -151,7 +151,7 @@ def main():
         default_root_dir=dir_log+name_output,
     )
     
-    torch.set_float32_matmul_precision('medium')
+    torch.set_float32_matmul_precision('high')
     # Start the training
     trainer.fit(model=model, datamodule=datamodule)
     
