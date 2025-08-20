@@ -5,8 +5,24 @@ torchvision
 # Framework de alto nível para PyTorch
 pytorch-lightning
 
-# Modelos de segmentação pré-treinados
+# ---- Modelos de Segmentação ----
+
+# Para modelos como U-Net, DeepLabV3+, etc. (usado em scripts anteriores)
 segmentation-models-pytorch
+timm # Dependência para alguns encoders do segmentation-models-pytorch
+
+# Para modelos da Hugging Face, como o SegFormer
+transformers
+
+# ---- Métricas e Utilitários de Machine Learning ----
+
+# Para cálculo eficiente de métricas (IoU, F1-Score, etc.)
+torchmetrics
+
+# Útil para divisão de dados e outras funções de ML (dependência comum)
+scikit-learn
+
+# ---- Manipulação e Leitura de Dados ----
 
 # Manipulação de dados e dataframes
 pandas
@@ -23,6 +39,3 @@ tacoreader
 
 # Barra de progresso para loops
 tqdm
-
-# Dependência para alguns encoders do segmentation-models-pytorch
-timm
