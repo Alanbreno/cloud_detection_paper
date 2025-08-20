@@ -177,7 +177,7 @@ class SegformerLightningModule(pl.LightningModule):
     - Inclui o passo de teste (`test_step`).
     - Organizado para fácil customização de perda e otimizadores.
     """
-    def __init__(self, num_classes=4, in_channels=13, lr=1e-4, warmup_steps=500):
+    def __init__(self, model_name, num_classes=4, in_channels=13, lr=1e-4, warmup_steps=500):
         super().__init__()
         # Salva os hiperparâmetros (serão logados automaticamente pelo Lightning)
         self.save_hyperparameters()
@@ -185,7 +185,7 @@ class SegformerLightningModule(pl.LightningModule):
         # 1. Carrega o modelo SegFormer pré-treinado com o encoder B2
         # O modelo base é o `nvidia/segformer-b2-finetuned-ade-512-512`
         self.model = SegformerForSemanticSegmentation.from_pretrained(
-            "nvidia/segformer-b2-finetuned-ade-512-512",
+            self.hparams.model_name,
             num_labels=self.hparams.num_classes,
             ignore_mismatched_sizes=True # Permite que a cabeça de classificação seja redimensionada para 4 classes
         )
@@ -200,7 +200,7 @@ class SegformerLightningModule(pl.LightningModule):
             kernel_size=original_first_layer.kernel_size,
             stride=original_first_layer.stride,
             padding=original_first_layer.padding,
-            bias=original_first_layer.bias
+            bias=(original_first_layer.bias is not None)
         )
 
         # 3. Define a função de perda (Loss Function)
@@ -214,7 +214,7 @@ class SegformerLightningModule(pl.LightningModule):
         # Usar um ModuleDict ajuda a organizar as métricas.
         self.metrics = nn.ModuleDict()
         for phase in ['train', 'val', 'test']:
-            self.metrics[phase] = nn.ModuleDict({
+            self.metrics[f'{phase}_metrics'] = nn.ModuleDict({
                 'iou': torchmetrics.JaccardIndex(task="multiclass", num_classes=self.hparams.num_classes),
                 'f1': torchmetrics.F1Score(task="multiclass", num_classes=self.hparams.num_classes),
                 'accuracy': torchmetrics.Accuracy(task="multiclass", num_classes=self.hparams.num_classes)
@@ -243,15 +243,15 @@ class SegformerLightningModule(pl.LightningModule):
         
         # Calcula as métricas
         preds = upsampled_logits.argmax(dim=1)
-        self.metrics[phase]['iou'].update(preds, masks)
-        self.metrics[phase]['f1'].update(preds, masks)
-        self.metrics[phase]['accuracy'].update(preds, masks)
+        self.metrics[f'{phase}_metrics']['iou'].update(preds, masks)
+        self.metrics[f'{phase}_metrics']['f1'].update(preds, masks)
+        self.metrics[f'{phase}_metrics']['accuracy'].update(preds, masks)
 
         return loss
 
     def on_train_epoch_end(self):
         # Loga as métricas ao final de cada época de treino
-        metrics = self.metrics['train']
+        metrics = self.metrics['train_metrics']
         self.log('train_iou', metrics['iou'].compute(), on_step=False, on_epoch=True)
         self.log('train_f1', metrics['f1'].compute(), on_step=False, on_epoch=True)
         self.log('train_acc', metrics['accuracy'].compute(), on_step=False, on_epoch=True)
@@ -270,7 +270,7 @@ class SegformerLightningModule(pl.LightningModule):
     
     def on_validation_epoch_end(self):
         # Loga as métricas ao final de cada época de validação
-        metrics = self.metrics['val']
+        metrics = self.metrics['val_metrics']
         self.log('val_iou', metrics['iou'].compute(), prog_bar=True)
         self.log('val_f1', metrics['f1'].compute(), prog_bar=True)
         self.log('val_acc', metrics['accuracy'].compute(), prog_bar=True)
@@ -284,7 +284,7 @@ class SegformerLightningModule(pl.LightningModule):
 
     def on_test_epoch_end(self):
         # Loga as métricas ao final do teste
-        metrics = self.metrics['test']
+        metrics = self.metrics['test_metrics']
         self.log('test_iou', metrics['iou'].compute())
         self.log('test_f1', metrics['f1'].compute())
         self.log('test_acc', metrics['accuracy'].compute())

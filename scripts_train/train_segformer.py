@@ -1,4 +1,4 @@
-from lightning_model import SegformerLightningModule
+from model import SegformerLightningModule
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.loggers import CSVLogger
@@ -98,10 +98,10 @@ def main():
 
     # Datamodule (mantido como estava)
     datamodule = CoreDataModule(
-        dataframe=df,
-        batch_size=args.batch_size,
-        num_workers = 4,
-        bandas=args.bandas_usadas,
+        dataframe = df,
+        batch_size = args.batch_size,
+        num_workers = 6,
+        bandas = args.bandas_usadas,
     )
     
     # MODIFICADO: Instanciação do novo modelo SegformerLightningModule

@@ -1,0 +1,25 @@
+
+======================================================
+        RELATÓRIO DE AVALIAÇÃO FINAL
+======================================================
+Checkpoint: epoch=55-val_iou=0.7550-val_loss=0.36.ckpt
+
+MÉTRICAS GERAIS:
+--------------------------------
+Acurácia Geral: 0.9033
+IoU (Macro):    0.7363
+IoU (Ponderado):0.8304
+
+RELATÓRIO DETALHADO POR CLASSE:
+--------------------------------
+               precision    recall  f1-score   support
+
+    Céu Limpo     0.9372    0.9510    0.9440 136267815
+Nuvem Espessa     0.9225    0.9239    0.9232  73075814
+   Nuvem Fina     0.6970    0.6827    0.6898  21985068
+       Sombra     0.8299    0.7730    0.8004  24261703
+
+     accuracy                         0.9033 255590400
+    macro avg     0.8466    0.8326    0.8394 255590400
+ weighted avg     0.9021    0.9033    0.9026 255590400
+

@@ -39,3 +39,6 @@ tacoreader
 
 # Barra de progresso para loops
 tqdm
+
+matplotlib
+seaborn
