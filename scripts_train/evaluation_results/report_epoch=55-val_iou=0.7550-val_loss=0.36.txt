@@ -4,22 +4,41 @@
 ======================================================
 Checkpoint: epoch=55-val_iou=0.7550-val_loss=0.36.ckpt
 
-MÉTRICAS GERAIS:
+MÉTRICAS GERAIS (scikit-learn):
 --------------------------------
 Acurácia Geral: 0.9033
+IoU (Micro):    0.8236
 IoU (Macro):    0.7363
 IoU (Ponderado):0.8304
 
-RELATÓRIO DETALHADO POR CLASSE:
+F1 Score (Micro):    0.9033
+F1 Score (Macro):    0.8394
+F1 Score (Ponderado):0.9026
 --------------------------------
-               precision    recall  f1-score   support
+--------------------------------
+MÉTRICAS GERAIS (Segmentation Models PyTorch)
+--------------------------------
+Acurácia (Micro): 0.9516
+Acurácia (Macro): 0.9516
+IoU (Micro):     0.8236
+IoU (Macro):     0.7363
+F1 Score (Micro): 0.9033
+F1 Score (Macro): 0.8394
+Recall (Micro):  0.9033
+Recall (Macro):  0.8326
+Precision (Micro): 0.9033
+Precision (Macro): 0.8466
+Sensibilidade (Micro): 0.9033
 
-    Céu Limpo     0.9372    0.9510    0.9440 136267815
-Nuvem Espessa     0.9225    0.9239    0.9232  73075814
-   Nuvem Fina     0.6970    0.6827    0.6898  21985068
-       Sombra     0.8299    0.7730    0.8004  24261703
 
-     accuracy                         0.9033 255590400
-    macro avg     0.8466    0.8326    0.8394 255590400
- weighted avg     0.9021    0.9033    0.9026 255590400
+                 precision    recall  f1-score   support
+
+      Ceu Limpo     0.9372    0.9510    0.9440 136267815
+  Nuvem Espessa     0.9225    0.9239    0.9232  73075814
+     Nuvem Fina     0.6970    0.6827    0.6898  21985068
+Sombra de Nuvem     0.8299    0.7730    0.8004  24261703
+
+       accuracy                         0.9033 255590400
+      macro avg     0.8466    0.8326    0.8394 255590400
+   weighted avg     0.9021    0.9033    0.9026 255590400
 
