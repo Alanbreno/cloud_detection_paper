@@ -124,12 +124,21 @@ def main():
         mode="max",      # Queremos maximizar o IoU
         save_top_k=1,
     )
-    earlystopping_callback = EarlyStopping(
-        monitor="val_iou", # Também monitora o IoU
-        patience=15,       # Aumentei a paciência, pois o IoU pode flutuar um pouco mais que a loss
-        mode="max"
+    
+    checkpoint_callback_2 = ModelCheckpoint(
+        dirpath=dir_log + name_output,
+        filename="{epoch}-{val_recall_Nuvem_Fina:.4f}-{val_loss:.2f}",
+        monitor="val_recall_Nuvem_Fina", # Monitora a métrica de recall para a classe "Nuvem_Fina"
+        mode="max",      # Queremos maximizar o recall
+        save_top_k=1,
     )
-    callbacks = [checkpoint_callback, earlystopping_callback]
+    
+    earlystopping_callback = EarlyStopping(
+        monitor="val_loss", # Também monitora a loss
+        patience=10,       # Aumentei a paciência, pois o IoU pode flutuar um pouco mais que a loss
+        mode="min"
+    )
+    callbacks = [checkpoint_callback, earlystopping_callback, checkpoint_callback_2]
     
     # Trainer (mantido como estava)
     trainer = pl.Trainer(

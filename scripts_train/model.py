@@ -7,6 +7,7 @@ import torch.nn as nn
 from transformers import SegformerForSemanticSegmentation
 from torch.optim.lr_scheduler import CosineAnnealingLR, LambdaLR
 import torchmetrics
+from torchmetrics.classification import MulticlassRecall, MulticlassPrecision
 
 
 class CD_Sentinel_2(pl.LightningModule):
@@ -181,7 +182,8 @@ class SegformerLightningModule(pl.LightningModule):
         super().__init__()
         # Salva os hiperparâmetros (serão logados automaticamente pelo Lightning)
         self.save_hyperparameters()
-
+        # Dicionário para mapear o índice da classe ao nome
+        self.class_names = {0: 'Ceu_Limpo', 1: 'Nuvem_Espessa', 2: 'Nuvem_Fina', 3: 'Sombra'}
         # 1. Carrega o modelo SegFormer pré-treinado com o encoder B2
         # O modelo base é o `nvidia/segformer-b2-finetuned-ade-512-512`
         self.model = SegformerForSemanticSegmentation.from_pretrained(
@@ -206,18 +208,19 @@ class SegformerLightningModule(pl.LightningModule):
         # 3. Define a função de perda (Loss Function)
         # CrossEntropy é um ótimo ponto de partida. Veja a discussão abaixo para outras opções.
         # Para lidar com desbalanceamento de classes, você pode adicionar pesos:
-        # class_weights = torch.tensor([0.1, 0.4, 0.4, 0.1]) # Exemplo
-        # self.loss_fn = nn.CrossEntropyLoss(weight=class_weights)
-        self.loss_fn = nn.CrossEntropyLoss()
+        class_weights = torch.tensor([1, 2.0714, 5.7016, 6.2075]) # Exemplo
+        self.loss_fn = nn.CrossEntropyLoss(weight=class_weights)
 
         # 4. Define as métricas para cada fase (treino, validação, teste)
         # Usar um ModuleDict ajuda a organizar as métricas.
         self.metrics = nn.ModuleDict()
         for phase in ['train', 'val', 'test']:
             self.metrics[f'{phase}_metrics'] = nn.ModuleDict({
-                'iou': torchmetrics.JaccardIndex(task="multiclass", num_classes=self.hparams.num_classes),
-                'f1': torchmetrics.F1Score(task="multiclass", num_classes=self.hparams.num_classes),
-                'accuracy': torchmetrics.Accuracy(task="multiclass", num_classes=self.hparams.num_classes)
+                'iou': torchmetrics.JaccardIndex(task="multiclass", num_classes=self.hparams.num_classes, average='micro'),
+                'f1': torchmetrics.F1Score(task="multiclass", num_classes=self.hparams.num_classes, average='micro'),
+                'accuracy': torchmetrics.Accuracy(task="multiclass", num_classes=self.hparams.num_classes, average='micro'),
+                'recall' : MulticlassRecall(num_classes=self.hparams.num_classes, average=None),
+                'precision': MulticlassPrecision(num_classes=self.hparams.num_classes, average=None)
             })
 
     def forward(self, x):
@@ -246,6 +249,8 @@ class SegformerLightningModule(pl.LightningModule):
         self.metrics[f'{phase}_metrics']['iou'].update(preds, masks)
         self.metrics[f'{phase}_metrics']['f1'].update(preds, masks)
         self.metrics[f'{phase}_metrics']['accuracy'].update(preds, masks)
+        self.metrics[f'{phase}_metrics']['recall'].update(preds, masks)
+        self.metrics[f'{phase}_metrics']['precision'].update(preds, masks)
 
         return loss
 
@@ -255,6 +260,19 @@ class SegformerLightningModule(pl.LightningModule):
         self.log('train_iou', metrics['iou'].compute(), on_step=False, on_epoch=True)
         self.log('train_f1', metrics['f1'].compute(), on_step=False, on_epoch=True)
         self.log('train_acc', metrics['accuracy'].compute(), on_step=False, on_epoch=True)
+
+        per_class_recall = self.metrics['train_metrics']['recall'].compute()
+        for i, recall in enumerate(per_class_recall):
+            class_name = self.class_names.get(i, f'class_{i}')
+            self.log(f'train_recall_{class_name}', recall, prog_bar=True)
+        metrics['train_metrics']['recall'].reset()
+
+        per_class_precision = self.metrics['train_metrics']['precision'].compute()
+        for i, precision in enumerate(per_class_precision):
+            class_name = self.class_names.get(i, f'class_{i}')
+            self.log(f'train_precision_{class_name}', precision, prog_bar=True)
+        metrics['train_metrics']['precision'].reset()
+
         metrics['iou'].reset()
         metrics['f1'].reset()
         metrics['accuracy'].reset()
@@ -277,6 +295,18 @@ class SegformerLightningModule(pl.LightningModule):
         metrics['iou'].reset()
         metrics['f1'].reset()
         metrics['accuracy'].reset()
+        
+        per_class_recall = self.metrics['val_metrics']['recall'].compute()
+        for i, recall in enumerate(per_class_recall):
+            class_name = self.class_names.get(i, f'class_{i}')
+            self.log(f'val_recall_{class_name}', recall, prog_bar=True)
+        metrics['val_metrics']['recall'].reset()
+
+        per_class_precision = self.metrics['val_metrics']['precision'].compute()
+        for i, precision in enumerate(per_class_precision):
+            class_name = self.class_names.get(i, f'class_{i}')
+            self.log(f'val_precision_{class_name}', precision, prog_bar=True)
+        metrics['val_metrics']['precision'].reset()
 
     def test_step(self, batch, batch_idx):
         loss = self._shared_step(batch, 'test')
@@ -291,6 +321,18 @@ class SegformerLightningModule(pl.LightningModule):
         metrics['iou'].reset()
         metrics['f1'].reset()
         metrics['accuracy'].reset()
+
+        per_class_recall = self.metrics['test_metrics']['recall'].compute()
+        for i, recall in enumerate(per_class_recall):
+            class_name = self.class_names.get(i, f'class_{i}')
+            self.log(f'test_recall_{class_name}', recall, prog_bar=True)
+        metrics['test_metrics']['recall'].reset()
+
+        per_class_precision = self.metrics['test_metrics']['precision'].compute()
+        for i, precision in enumerate(per_class_precision):
+            class_name = self.class_names.get(i, f'class_{i}')
+            self.log(f'test_precision_{class_name}', precision, prog_bar=True)
+        metrics['test_metrics']['precision'].reset()
 
 
     def configure_optimizers(self):
