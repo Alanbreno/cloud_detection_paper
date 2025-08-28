@@ -259,19 +259,19 @@ class SegformerLightningModule(pl.LightningModule):
         metrics = self.metrics['train_metrics']
         self.log('train_iou', metrics['iou'].compute(), on_step=False, on_epoch=True)
         self.log('train_f1', metrics['f1'].compute(), on_step=False, on_epoch=True)
-        self.log('train_acc', metrics['accuracy'].compute(), on_step=False, on_epoch=True)
+        self.log('train_acc', metrics['accuracy'].compute(), on_step=False, on_epoch=True, prog_bar=True)
 
-        per_class_recall = self.metrics['train_metrics']['recall'].compute()
+        per_class_recall = metrics['recall'].compute()
         for i, recall in enumerate(per_class_recall):
             class_name = self.class_names.get(i, f'class_{i}')
-            self.log(f'train_recall_{class_name}', recall, prog_bar=True)
-        metrics['train_metrics']['recall'].reset()
+            self.log(f'train_recall_{class_name}', recall, prog_bar=False)
+        metrics['recall'].reset()
 
-        per_class_precision = self.metrics['train_metrics']['precision'].compute()
+        per_class_precision = metrics['precision'].compute()
         for i, precision in enumerate(per_class_precision):
             class_name = self.class_names.get(i, f'class_{i}')
-            self.log(f'train_precision_{class_name}', precision, prog_bar=True)
-        metrics['train_metrics']['precision'].reset()
+            self.log(f'train_precision_{class_name}', precision, prog_bar=False)
+        metrics['precision'].reset()
 
         metrics['iou'].reset()
         metrics['f1'].reset()
@@ -289,24 +289,24 @@ class SegformerLightningModule(pl.LightningModule):
     def on_validation_epoch_end(self):
         # Loga as métricas ao final de cada época de validação
         metrics = self.metrics['val_metrics']
-        self.log('val_iou', metrics['iou'].compute(), prog_bar=True)
-        self.log('val_f1', metrics['f1'].compute(), prog_bar=True)
+        self.log('val_iou', metrics['iou'].compute(), prog_bar=False)
+        self.log('val_f1', metrics['f1'].compute(), prog_bar=False)
         self.log('val_acc', metrics['accuracy'].compute(), prog_bar=True)
         metrics['iou'].reset()
         metrics['f1'].reset()
         metrics['accuracy'].reset()
-        
-        per_class_recall = self.metrics['val_metrics']['recall'].compute()
+
+        per_class_recall = metrics['recall'].compute()
         for i, recall in enumerate(per_class_recall):
             class_name = self.class_names.get(i, f'class_{i}')
-            self.log(f'val_recall_{class_name}', recall, prog_bar=True)
-        metrics['val_metrics']['recall'].reset()
+            self.log(f'val_recall_{class_name}', recall, prog_bar=False)
+        metrics['recall'].reset()
 
-        per_class_precision = self.metrics['val_metrics']['precision'].compute()
+        per_class_precision = metrics['precision'].compute()
         for i, precision in enumerate(per_class_precision):
             class_name = self.class_names.get(i, f'class_{i}')
-            self.log(f'val_precision_{class_name}', precision, prog_bar=True)
-        metrics['val_metrics']['precision'].reset()
+            self.log(f'val_precision_{class_name}', precision, prog_bar=False)
+        metrics['precision'].reset()
 
     def test_step(self, batch, batch_idx):
         loss = self._shared_step(batch, 'test')
@@ -322,17 +322,17 @@ class SegformerLightningModule(pl.LightningModule):
         metrics['f1'].reset()
         metrics['accuracy'].reset()
 
-        per_class_recall = self.metrics['test_metrics']['recall'].compute()
+        per_class_recall = metrics['recall'].compute()
         for i, recall in enumerate(per_class_recall):
             class_name = self.class_names.get(i, f'class_{i}')
-            self.log(f'test_recall_{class_name}', recall, prog_bar=True)
-        metrics['test_metrics']['recall'].reset()
+            self.log(f'test_recall_{class_name}', recall, prog_bar=False)
+        metrics['recall'].reset()
 
-        per_class_precision = self.metrics['test_metrics']['precision'].compute()
+        per_class_precision = metrics['precision'].compute()
         for i, precision in enumerate(per_class_precision):
             class_name = self.class_names.get(i, f'class_{i}')
-            self.log(f'test_precision_{class_name}', precision, prog_bar=True)
-        metrics['test_metrics']['precision'].reset()
+            self.log(f'test_precision_{class_name}', precision, prog_bar=False)
+        metrics['precision'].reset()
 
 
     def configure_optimizers(self):
