@@ -16,7 +16,7 @@
 #   mem=16gb        -> Quantidade de memória RAM por chunk.
 #   ngpus=1         -> Número de GPUs por chunk (remova se não for usar GPU).
 #   host=nome_do_no -> (OPCIONAL) Força a execução em um nó específico. Use com cuidado.
-#PBS -l select=1:ncpus=28:mem=94gb:ngpus=0
+#PBS -l select=1:ncpus=28:mem=94gb:ngpus=0:host=node28
 
 # WALLTIME: Tempo máximo de execução do job (HH:MM:SS).
 # Se o job exceder este tempo, será cancelado.
