@@ -93,7 +93,7 @@ def main():
     
     # MODIFICADO: Nome do diretório de saída para refletir o novo modelo
     name_output = f'{args.tipo_imagem}_segformer_mit-{args.segformer_backbone}_{num_bandas}bandas'
-    dir_log = r'./lightning_logs/'
+    dir_log = r'/home/mseruffo/lightning_logs/'
     tb_logger = CSVLogger(dir_log, name=name_output)
 
     # Datamodule (mantido como estava)
