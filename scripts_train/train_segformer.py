@@ -106,7 +106,8 @@ def main():
     
     # MODIFICADO: Instanciação do novo modelo SegformerLightningModule
     # O nome do backbone é passado para o construtor do modelo
-    model_name = f"nvidia/segformer-{args.segformer_backbone}-finetuned-ade-512-512"
+    #model_name = f"nvidia/segformer-{args.segformer_backbone}-finetuned-ade-512-512"
+    model_name = f"/home/mseruffo/modelos_offline/segformer-{args.segformer_backbone}"
 
     model = SegformerLightningModule(
         model_name=model_name,
