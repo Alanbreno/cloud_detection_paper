@@ -37,7 +37,7 @@ def main():
         help="Tamanho do backbone MiT do SegFormer a ser usado (padrão: 'b2')."
     )
     parser.add_argument(
-        "-b", "--batch_size", type=int, default=8,
+        "-b", "--batch_size", type=int, default=32,
         help="Tamanho do lote (batch size) para o treinamento (padrão: 8)."
     )
     # NOVO: Argumentos para controlar hiperparâmetros do SegformerLightningModule

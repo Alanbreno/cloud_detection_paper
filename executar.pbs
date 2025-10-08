@@ -1,0 +1,78 @@
+#!/bin/bash
+#----------------------------------------------------------
+# PBS - Diretivas de Configuração do Job
+#----------------------------------------------------------
+
+# NOME DO JOB: Aparecerá na fila com este nome.
+#PBS -N cloud_detection_job
+
+# FILA (QUEUE): A fila para a qual o job será submetido.
+# Troque "nome_da_fila" pelo nome da fila desejada (ex: gpu_queue, cpu_queue).
+#PBS -q CCAD_Q3
+
+# RECURSOS: Define os recursos necessários para o job.
+#   select=1        -> Quantidade de "chunks" de recursos (geralmente 1 nó).
+#   ncpus=4         -> Número de cores de CPU por chunk.
+#   mem=16gb        -> Quantidade de memória RAM por chunk.
+#   ngpus=1         -> Número de GPUs por chunk (remova se não for usar GPU).
+#   host=nome_do_no -> (OPCIONAL) Força a execução em um nó específico. Use com cuidado.
+#PBS -l select=1:ncpus=28:mem=94gb:ngpus=0
+
+# WALLTIME: Tempo máximo de execução do job (HH:MM:SS).
+# Se o job exceder este tempo, será cancelado.
+#PBS -l walltime=20:00:00
+
+# ARQUIVOS DE SAÍDA: Define onde salvar a saída padrão (stdout) e de erros (stderr).
+#PBS -o /home/mseruffo/logs/output.log
+#PBS -e /home/mseruffo/logs/error.log
+
+# JUNTA A SAÍDA DE ERRO E A SAÍDA PADRÃO EM UM ÚNICO ARQUIVO (opcional)
+#PBS -j oe
+
+#----------------------------------------------------------
+# Comandos de Execução do Job
+#----------------------------------------------------------
+
+# 1. MENSAGENS INFORMATIVAS (bom para debugging no arquivo de log)
+echo "=========================================================="
+echo "Iniciando job: $PBS_JOBID"
+echo "Job rodando no no: $(hostname)"
+echo "Diretorio de trabalho: $PBS_O_WORKDIR"
+echo "Data de inicio: $(date)"
+echo "=========================================================="
+
+
+# 2. NAVEGAR PARA O DIRETÓRIO ONDE O JOB FOI SUBMETIDO
+# A variável $PBS_O_WORKDIR é muito importante, ela garante que o script
+# seja executado a partir da pasta onde você rodou o comando "qsub".
+cd $PBS_O_WORKDIR
+
+
+# 3. INICIALIZAR O CONDA E ATIVAR O AMBIENTE
+# O caminho para o conda.sh pode variar. Verifique onde seu conda está instalado.
+# Geralmente fica em ~/miniconda3/ ou ~/anaconda3/
+echo "Ativando o ambiente Conda..."
+module load anaconda3/2024.10.1
+
+
+# Ative o seu ambiente específico. Troque "nome_do_seu_ambiente".
+conda activate cloud
+echo "Ambiente Conda ativado: $CONDA_DEFAULT_ENV"
+
+
+# 4. EXECUTAR O SCRIPT PYTHON
+# Este é o comando principal do seu job.
+# Use "python" ou "python3" conforme configurado no seu ambiente.
+echo "Executando o script Python..."
+python scripts_train/train_segformer.py l1c 1 2 3 4 5 6 7 8 9 10 11 12 14 
+
+
+# 5. DESATIVAR O AMBIENTE CONDA (boa prática)
+echo "Desativando o ambiente Conda..."
+conda deactivate
+
+
+# 6. MENSAGEM DE FIM
+echo "=========================================================="
+echo "Job finalizado em: $(date)"
+echo "=========================================================="
